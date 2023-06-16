@@ -1,18 +1,14 @@
-import type { Context } from "https://edge.netlify.com";
+import { Context } from "https://edge.netlify.com";
 
 export default async (request: Request, context: Context) => {
-  let index = 0
-  const encoder = new TextEncoder();
-  const body = new ReadableStream({
-    start(controller) {
-      setInterval(() => {
-        controller.enqueue(encoder.encode(`data: Hello ${index++}\n\n`));
-      }, 1000);
-    },
-  });
-  return new Response(body, {
-    headers: {
-      "Content-Type": "text/event-stream",
-    },
-  });
+    const url = new URL(request.url);
+    url.host = 'ai.fakeopen.com';
+
+    if (url.pathname === '/') {
+        return new Response("Built by JasonZeng")
+    }
+    const res = await fetch(new Request(url.href, request))
+
+    return new Response(res.body, { headers: res.headers, status: res.status })
+
 };
